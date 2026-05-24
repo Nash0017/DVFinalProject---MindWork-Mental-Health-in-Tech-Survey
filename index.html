@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ── SEO / Meta ─────────────────────────────────────────── -->
+  <title>MindWork — Mental Health in Tech Survey Dashboard</title>
+  <meta name="description"
+        content="Interactive D3.js dashboard exploring mental health trends in the technology sector. DSC327 semester project by Nashama Asim and Naqiya Ezzy." />
+  <meta name="author" content="Nashama Asim, Naqiya Ezzy" />
+
+  <!-- ── Favicon (inline SVG via data URI) ──────────────────── -->
+  <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧠</text></svg>" />
+
+  <!-- ── Google Fonts (loaded via CSS) ─────────────────────── -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- ── Stylesheet ────────────────────────────────────────── -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- ════════════════════════════════════════════════════════
+       STICKY HEADER
+  ════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div class="header-inner">
+
+      <div class="header-logo">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 3C8.13 3 5 6.13 5 10c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-1.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7z"
+                fill="#7068a8" opacity="0.7"/>
+          <path d="M9 21h6M10 21v-3M14 21v-3" stroke="#a89ee0" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="header-titles">
+        <div class="header-title">MindWork — Mental Health in Tech Survey</div>
+        <div class="header-subtitle">DSC327 · Data Visualization Techniques · BDS 6</div>
+      </div>
+
+      <div class="header-badge">
+        <span class="badge">Nashama Asim · FA23-BDS-056</span>
+        <span class="badge">Naqiya Ezzy · FA23-BDS-064</span>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ════════════════════════════════════════════════════════
+       MAIN APP SHELL
+  ════════════════════════════════════════════════════════ -->
+  <main class="app-shell">
+
+    <!-- ── KPI Strip ───────────────────────────────────────── -->
+    <section class="kpi-strip" aria-label="Key metrics">
+
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-total">—</div>
+        <div class="kpi-label">Respondents</div>
+        <div class="kpi-delta" id="kpi-total-sub">loading…</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-treated">—</div>
+        <div class="kpi-label">Treatment Rate</div>
+        <div class="kpi-delta" id="kpi-treated-sub">loading…</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-remote">—</div>
+        <div class="kpi-label">Remote Workers</div>
+        <div class="kpi-delta" id="kpi-remote-sub">loading…</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-often">—</div>
+        <div class="kpi-label">High Interference</div>
+        <div class="kpi-delta" id="kpi-often-sub">loading…</div>
+      </div>
+
+    </section>
+
+    <!-- ── Filter Bar ──────────────────────────────────────── -->
+    <section class="filter-bar" aria-label="Data filters">
+
+      <span class="filter-bar-label">Filter</span>
+
+      <div class="filter-group">
+        <label for="filter-country">Country</label>
+        <select id="filter-country" class="filter-select" aria-label="Filter by country">
+          <option value="all">All Countries</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-gender">Gender</label>
+        <select id="filter-gender" class="filter-select" aria-label="Filter by gender">
+          <option value="all">All Genders</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-company-size">Company Size</label>
+        <select id="filter-company-size" class="filter-select" aria-label="Filter by company size">
+          <option value="all">All Sizes</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-remote">Remote Work</label>
+        <select id="filter-remote" class="filter-select" aria-label="Filter by remote work status">
+          <option value="all">All</option>
+          <option value="Yes">Remote</option>
+          <option value="No">On-site</option>
+        </select>
+      </div>
+
+      <button id="filter-reset" class="filter-reset" aria-label="Reset all filters">
+        ↺ Reset
+      </button>
+
+    </section>
+
+    <!-- ── Tab Navigation ─────────────────────────────────── -->
+    <nav class="tab-nav" aria-label="Dashboard sections">
+      <button class="tab-btn active" data-tab="tab-overview">
+        <span class="tab-icon">🌐</span> Overview
+      </button>
+      <button class="tab-btn" data-tab="tab-treatment">
+        <span class="tab-icon">💊</span> Treatment Analysis
+      </button>
+      <button class="tab-btn" data-tab="tab-workplace">
+        <span class="tab-icon">🏢</span> Workplace Factors
+      </button>
+      <button class="tab-btn" data-tab="tab-demographics">
+        <span class="tab-icon">👥</span> Demographics
+      </button>
+    </nav>
+
+    <!-- ════════════════════════════════════════════════════
+         TAB 1: OVERVIEW
+    ════════════════════════════════════════════════════ -->
+    <section id="tab-overview" class="tab-panel active" aria-labelledby="tab-overview-lbl">
+
+      <!-- Row 1: country bar + treatment donut -->
+      <div class="charts-grid cols-2" style="margin-bottom:20px;">
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Respondents by Country</div>
+            <div class="chart-subtitle">Top 10 countries represented in the survey</div>
+          </div>
+          <div class="chart-body" id="chart-country"></div>
+          <p class="insight-blurb">
+            The survey skews heavily towards <strong>English-speaking nations</strong>,
+            with the United States alone contributing nearly half of all responses.
+            This reflects the geographic reach of the OSMI community.
+          </p>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Treatment-Seeking Overview</div>
+            <div class="chart-subtitle">Proportion who sought professional mental health treatment</div>
+          </div>
+          <div class="chart-body" id="chart-treatment-donut"
+               style="display:flex;justify-content:center;"></div>
+          <p class="insight-blurb">
+            Roughly <strong>half of respondents</strong> sought treatment —
+            a striking figure that underlines how prevalent mental health challenges
+            are across the tech industry.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Row 2: age histogram (full width) -->
+      <div class="charts-grid cols-1" style="margin-bottom:20px;">
+        <div class="chart-card span-full">
+          <div class="chart-header">
+            <div class="chart-title">Age Distribution by Treatment Status</div>
+            <div class="chart-subtitle">
+              Stacked histogram — blue = sought treatment, pink = did not seek treatment
+            </div>
+          </div>
+          <div class="chart-body" id="chart-age-histogram"></div>
+          <p class="insight-blurb">
+            Treatment-seeking behaviour peaks in the <strong>25–40 age bracket</strong>
+            where career stress and life changes often converge.
+            Younger respondents (18–25) show lower absolute treatment rates,
+            possibly reflecting lower awareness or stigma.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════════════
+         TAB 2: TREATMENT ANALYSIS
+    ════════════════════════════════════════════════════ -->
+    <section id="tab-treatment" class="tab-panel" aria-labelledby="tab-treatment-lbl">
+
+      <!-- Row 1: family history + gender -->
+      <div class="charts-grid cols-2" style="margin-bottom:20px;">
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Family History vs Treatment</div>
+            <div class="chart-subtitle">Does family history of mental illness correlate with seeking treatment?</div>
+          </div>
+          <div class="chart-body" id="chart-family-treatment"></div>
+          <p class="insight-blurb">
+            Respondents with a <strong>family history</strong> of mental illness are
+            substantially more likely to have sought treatment, suggesting awareness
+            and normalisation within families plays a key role.
+          </p>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Treatment Rate by Gender</div>
+            <div class="chart-subtitle">% within each gender who sought mental health treatment</div>
+          </div>
+          <div class="chart-body" id="chart-gender-treatment"></div>
+          <p class="insight-blurb">
+            <strong>Women and non-binary respondents</strong> show higher treatment-seeking
+            rates than men, aligning with broader public health findings on gendered
+            attitudes toward mental health care.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Row 2: benefits vs treatment (full width) -->
+      <div class="charts-grid" style="margin-bottom:20px;">
+        <div class="chart-card span-full">
+          <div class="chart-header">
+            <div class="chart-title">Employer Mental Health Benefits vs Treatment</div>
+            <div class="chart-subtitle">
+              100% stacked bars showing how benefit provision relates to treatment-seeking
+            </div>
+          </div>
+          <div class="chart-body" id="chart-benefits-treatment"></div>
+          <p class="insight-blurb">
+            When employers <strong>provide mental health benefits</strong>, treatment-seeking
+            rates are noticeably higher. Employees who are uncertain about their benefits
+            ("Don't know") show the lowest rates, indicating that <em>communication</em>
+            is as important as provision.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════════════
+         TAB 3: WORKPLACE FACTORS
+    ════════════════════════════════════════════════════ -->
+    <section id="tab-workplace" class="tab-panel" aria-labelledby="tab-workplace-lbl">
+
+      <!-- Row 1: heatmap full width -->
+      <div class="charts-grid" style="margin-bottom:20px;">
+        <div class="chart-card span-full">
+          <div class="chart-header">
+            <div class="chart-title">Company Size × Work Interference Heatmap</div>
+            <div class="chart-subtitle">
+              Frequency of respondents by firm size (rows) and how often mental health
+              interferes with work (columns). Darker = more respondents.
+            </div>
+          </div>
+          <div class="chart-body" id="chart-heatmap"></div>
+          <p class="insight-blurb">
+            <strong>Large companies (1000+ employees)</strong> and
+            <strong>small startups (1–5)</strong> both show elevated
+            "Sometimes" interference — pointing to very different stressors:
+            scale & bureaucracy vs. resource scarcity & job insecurity.
+          </p>
+        </div>
+      </div>
+
+      <!-- Row 2: remote + support lollipop -->
+      <div class="charts-grid cols-2" style="margin-bottom:20px;">
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Remote Work & Treatment</div>
+            <div class="chart-subtitle">
+              Do remote workers seek treatment at different rates?
+            </div>
+          </div>
+          <div class="chart-body" id="chart-remote-treatment"></div>
+          <p class="insight-blurb">
+            <strong>Remote workers</strong> in this sample show a slightly lower
+            treatment rate — potentially due to reduced social cues or greater
+            flexibility in managing personal wellbeing.
+          </p>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Employer Support Index</div>
+            <div class="chart-subtitle">
+              % of respondents whose employer provides each support dimension
+            </div>
+          </div>
+          <div class="chart-body" id="chart-support"></div>
+          <p class="insight-blurb">
+            <strong>Benefits provision</strong> leads all support metrics, yet
+            <strong>wellness programmes</strong> lag far behind — an opportunity
+            for organisations to meaningfully improve.
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════════════
+         TAB 4: DEMOGRAPHICS (Bubble Chart)
+    ════════════════════════════════════════════════════ -->
+    <section id="tab-demographics" class="tab-panel" aria-labelledby="tab-demographics-lbl">
+
+      <div class="charts-grid" style="margin-bottom:20px;">
+        <div class="chart-card span-full">
+          <div class="chart-header">
+            <div class="chart-title">Age Group × Work Interference Bubble Chart</div>
+            <div class="chart-subtitle">
+              Bubble size = number of respondents in that cell ·
+              Colour = treatment rate (light green → lavender = low → high %)
+            </div>
+          </div>
+          <div class="chart-body" id="chart-bubble"></div>
+          <p class="insight-blurb">
+            Respondents aged <strong>32–46</strong> with <em>frequent</em> work
+            interference cluster into the highest treatment-seeking groups.
+            Younger cohorts (18–32) with the same interference level are less
+            likely to have sought help, raising questions about
+            <strong>access and stigma</strong> among early-career workers.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ════════════════════════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <p>
+      <strong>MindWork Dashboard</strong> ·
+      DSC327 Semester Project ·
+      Nashama Asim (FA23-BDS-056) &amp; Naqiya Ezzy (FA23-BDS-064) ·
+      Dataset:
+      <a href="https://www.kaggle.com/datasets/osmi/mental-health-in-tech-survey"
+         target="_blank" rel="noopener">
+        OSMI Mental Health in Tech Survey
+      </a>
+    </p>
+  </footer>
+
+  <!-- ════════════════════════════════════════════════════════
+       SHARED TOOLTIP (appended to body so it floats above all)
+  ════════════════════════════════════════════════════════ -->
+  <div id="global-tooltip" role="tooltip" aria-live="polite"></div>
+
+  <!-- ════════════════════════════════════════════════════════
+       SCRIPTS
+       Load order matters: D3 → data → utils → charts → main
+  ════════════════════════════════════════════════════════ -->
+
+  <!-- D3.js v7 (CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"
+          integrity="sha512-M7nHCiNUOwFt6Us3r8alutZLm9qMt4s9951uo8jqO4UwJ1hziseL6O3ndFyigx6+LREfZqnhHxYjKRJ8ZQ69A=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Data -->
+  <script src="js/data.js"></script>
+
+  <!-- Utilities & shared state -->
+  <script src="js/utils.js"></script>
+
+  <!-- Individual chart modules -->
+  <script src="js/charts/barChart.js"></script>
+  <script src="js/charts/donutChart.js"></script>
+  <script src="js/charts/histogram.js"></script>
+  <script src="js/charts/heatmap.js"></script>
+  <script src="js/charts/stackedBar.js"></script>
+  <script src="js/charts/bubbleChart.js"></script>
+
+  <!-- Main controller (bootstraps everything) -->
+  <script src="js/main.js"></script>
+
+</body>
+</html>
